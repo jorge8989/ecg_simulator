@@ -9,6 +9,13 @@ $(function () {
   var baseLine = 235;
   var baseLineWidth = 2;
   
+  function paintBackground(color){
+    var ctx = $("#canvas1")[0].getContext("2d");
+    ctx.rect(0, 0, canvasWidth, canvasHeight);
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
+  
   function line(x, y, xx, yy, width, plus, color){
     var ctx = $("#canvas1")[0].getContext("2d");
     ctx.beginPath();
@@ -19,14 +26,15 @@ $(function () {
     ctx.stroke();
     ctx.closePath();
   }
+  
   function drawQuadricula(width, interval, plus, color) {
     var yPosition = 0;
     var xPosition = 0;
-    while (yPosition < canvasHeight) {
+    while (yPosition <= canvasHeight) {
       new line(0, yPosition, canvasWidth, yPosition, width, plus, color);
       yPosition += interval;
     }
-    while (xPosition < canvasWidth) {
+    while (xPosition <= canvasWidth) {
       new line(xPosition, 0, xPosition, canvasHeight, width, plus, color);
       xPosition += interval;
     }
@@ -63,6 +71,7 @@ $(function () {
   }
   
   function init() {
+    paintBackground("#fff");
     drawQuadricula(1, miniSquare, ".5", "#3f3f3f");
     drawQuadricula(1, bigSquare, "", "#3f3f3f");
     
