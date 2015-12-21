@@ -2,11 +2,11 @@ $(function () {
   
   var canvasHeight = parseInt($("#canvas1").attr("height"));
   var canvasWidth = parseInt($("#canvas1").attr("width"));
-  var miniSquare = 5;
+  var miniSquare = 6;
   var bigSquare = miniSquare*5;
   var second = bigSquare*5;
   var ecgColor = "#000"
-  var baseLine = 235;
+  var baseLine = 240;
   var baseLineWidth = 2;
   
   function paintBackground(color){
@@ -15,6 +15,17 @@ $(function () {
     ctx.fillStyle = color;
     ctx.fill();
   }
+  
+  function curve(amplitude, duration){
+    var ctx = $("#canvas1")[0].getContext("2d");
+    ctx.beginPath();
+    ctx.lineWidth = baseLineWidth;
+    ctx.moveTo(50, baseLine);
+    ctx.quadraticCurveTo(50+(duration/2), baseLine-amplitude, 50+duration, baseLine);
+    ctx.stroke();
+  }
+  
+  
   
   function line(x, y, xx, yy, width, plus, color){
     var ctx = $("#canvas1")[0].getContext("2d");
@@ -45,9 +56,9 @@ $(function () {
     new line(x, y, xx, y, baseLineWidth, "", ecgColor);
   }
   
-  function drawQRS(base, duration, rAmplitude, sAmplitude, freq) {
+  function drawQRS(base, qrsDuration, rAmplitude, sAmplitude, freq, pDuration, pAmplitude, PR) {
     freq = (300/freq)*bigSquare;
-    duration = duration - baseLineWidth;
+    qrsDuration = qrsDuration - baseLineWidth;
     rAmplitude = rAmplitude - baseLineWidth;
     sAmplitude = sAmplitude - baseLineWidth;
     var xPosition = freq; 
@@ -59,10 +70,13 @@ $(function () {
         xPosition = freq/2
       }
       ctx.lineTo(xPosition, base);
-      ctx.lineTo(xPosition+(duration/3), base-rAmplitude);
-      ctx.lineTo(xPosition+((duration/3)*2), base+sAmplitude);
-      ctx.lineTo(xPosition+duration, base);
-      xPosition += freq;
+      ctx.quadraticCurveTo(xPosition+(pDuration/2), baseLine-pAmplitude, xPosition+pDuration, baseLine);
+      ctx.lineTo(xPosition+PR, base);
+      xPosition += PR;
+      ctx.lineTo(xPosition+(qrsDuration/3), base-rAmplitude);
+      ctx.lineTo(xPosition+((qrsDuration/3)*2), base+sAmplitude);
+      ctx.lineTo(xPosition+qrsDuration, base);
+      xPosition += freq - PR;
     }
     ctx.strokeStyle = ecgColor;
     ctx.lineWidth = baseLineWidth;
@@ -74,9 +88,8 @@ $(function () {
     paintBackground("#fff");
     drawQuadricula(1, miniSquare, ".5", "#3f3f3f");
     drawQuadricula(1, bigSquare, "", "#3f3f3f");
-    
-    //drawBaseLine(0, canvasWidth, 235);
-    drawQRS(baseLine, second*0.10, bigSquare, miniSquare*4, 80);
+    drawQRS(baseLine, second*0.10, bigSquare, miniSquare*4, 70, miniSquare*2, miniSquare, miniSquare*3);
+    //new curve(miniSquare, miniSquare*2);
     
   }
   
