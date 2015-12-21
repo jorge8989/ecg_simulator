@@ -16,17 +16,6 @@ $(function () {
     ctx.fill();
   }
   
-  function curve(amplitude, duration){
-    var ctx = $("#canvas1")[0].getContext("2d");
-    ctx.beginPath();
-    ctx.lineWidth = baseLineWidth;
-    ctx.moveTo(50, baseLine);
-    ctx.quadraticCurveTo(50+(duration/2), baseLine-amplitude, 50+duration, baseLine);
-    ctx.stroke();
-  }
-  
-  
-  
   function line(x, y, xx, yy, width, plus, color){
     var ctx = $("#canvas1")[0].getContext("2d");
     ctx.beginPath();
@@ -52,11 +41,7 @@ $(function () {
   }
     
   
-  function drawBaseLine(x, xx, y) {
-    new line(x, y, xx, y, baseLineWidth, "", ecgColor);
-  }
-  
-  function drawQRS(base, qrsDuration, rAmplitude, sAmplitude, freq, pDuration, pAmplitude, PR) {
+  function drawECG(base, qrsDuration, rAmplitude, sAmplitude, freq, pDuration, pAmplitude, PR, ST) {
     freq = (300/freq)*bigSquare;
     qrsDuration = qrsDuration - baseLineWidth;
     rAmplitude = rAmplitude - baseLineWidth;
@@ -70,13 +55,19 @@ $(function () {
         xPosition = freq/2
       }
       ctx.lineTo(xPosition, base);
+      //p
       ctx.quadraticCurveTo(xPosition+(pDuration/2), baseLine-pAmplitude, xPosition+pDuration, baseLine);
       ctx.lineTo(xPosition+PR, base);
       xPosition += PR;
+      //qrs
       ctx.lineTo(xPosition+(qrsDuration/3), base-rAmplitude);
       ctx.lineTo(xPosition+((qrsDuration/3)*2), base+sAmplitude);
       ctx.lineTo(xPosition+qrsDuration, base);
-      xPosition += freq - PR;
+      xPosition = xPosition + ST + qrsDuration;
+      ctx.lineTo(xPosition, base);
+      //t
+      ctx.quadraticCurveTo(xPosition+miniSquare*2, base - miniSquare*3, xPosition+miniSquare*4, base  )
+      xPosition += freq - PR - ST - qrsDuration;
     }
     ctx.strokeStyle = ecgColor;
     ctx.lineWidth = baseLineWidth;
@@ -88,8 +79,8 @@ $(function () {
     paintBackground("#fff");
     drawQuadricula(1, miniSquare, ".5", "#3f3f3f");
     drawQuadricula(1, bigSquare, "", "#3f3f3f");
-    drawQRS(baseLine, second*0.10, bigSquare, miniSquare*4, 70, miniSquare*2, miniSquare, miniSquare*3);
-    //new curve(miniSquare, miniSquare*2);
+    drawECG(baseLine, second*0.10, bigSquare, miniSquare*4, 75, miniSquare*2, 
+            miniSquare, miniSquare*3, miniSquare*3);
     
   }
   
